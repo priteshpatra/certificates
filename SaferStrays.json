@@ -1,0 +1,261 @@
+{
+  "name": "SaferStrays",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stray-report",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -100
+      ],
+      "id": "d4b9c6ac-c39a-4fe6-a6d4-a253b7a711df",
+      "name": "Webhook1",
+      "webhookId": "9edd5b56-8765-42fe-9ee2-8dfe081de250"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-inference.huggingface.co/models/sshleifer/distilbart-cnn-12-6",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inputs",
+              "value": "=$json[\"description\"]\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1180,
+        -100
+      ],
+      "id": "01044ffa-6b7d-4cbd-8fe6-cb7fb7ebd7c8",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "DubOsvsrvEylo1sc",
+          "name": "my_request"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "grishmathakare21@gmail.com",
+        "toEmail": "grishmathakare21@gmail.com",
+        "subject": "New Stray Report",
+        "emailFormat": "text",
+        "text": "=Original Report:\n{{ $json[\"description\"] }}\n\nAI Summary:\n{{ $json[\"summary_text\"] }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1620,
+        180
+      ],
+      "id": "23dc0fdd-ecdb-4ba4-a496-f3f3b6efb28f",
+      "name": "Send email",
+      "webhookId": "599db106-b212-4905-ad15-4095e0f8f113",
+      "credentials": {
+        "smtp": {
+          "id": "5osrwv1n8dHGtnN3",
+          "name": "my gmail smtp"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1AZCRDlCHB60DVXgCE-EAlsttqBySO1Xb0UaK9iBTCqU",
+          "mode": "list",
+          "cachedResultName": "Stray Animal Reports",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AZCRDlCHB60DVXgCE-EAlsttqBySO1Xb0UaK9iBTCqU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AZCRDlCHB60DVXgCE-EAlsttqBySO1Xb0UaK9iBTCqU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ new Date().toISOString() }}\n",
+            "Summary": "={{ $json[\"summary_text\"] }}\n",
+            "Description": "={{ $json[\"description\"] }}\n"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1600,
+        -100
+      ],
+      "id": "a2b63278-8ccd-4ccc-b245-657f3a15fb8a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PhMncBoU2RSXWaGw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      description: \"Injured dog near temple gate\",\n      summary_text: \"Dog looks limping, weak and shivering\",\n      timestamp: new Date().toISOString()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        60
+      ],
+      "id": "37bfd596-3987-45c7-ba93-0afa4090b261",
+      "name": "Code"
+    }
+  ],
+  "pinData": {
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "code4compassionmumbai.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+            "content-length": "0",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "64.227.21.251",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "95b6b37c8517de0e-EWR",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "64.227.21.251, 104.23.187.62",
+            "x-forwarded-host": "code4compassionmumbai.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-50-54974b54fc-tfhrj",
+            "x-is-trusted": "yes",
+            "x-real-ip": "64.227.21.251"
+          },
+          "params": {},
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://code4compassionmumbai.app.n8n.cloud/webhook-test/stray-report",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        []
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ca0a6d21-fa45-46c5-856f-2cd5474a5b42",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5ca542e91d57140b8725fd754a276e1f7d7954fbd0b4ac3938664ff03ca9bbfa"
+  },
+  "id": "p4pnoeWajfaqGdtb",
+  "tags": []
+}
